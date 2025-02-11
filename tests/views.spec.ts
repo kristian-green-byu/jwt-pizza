@@ -1,6 +1,6 @@
 import {test, expect} from 'playwright-test-coverage';
 
-test('home page', async ({page}) => {
+test('home page displays normally', async ({page}) => {
   await page.goto('/');
 
   await expect(page.getByRole('list')).toContainText('home');
@@ -14,4 +14,19 @@ test('home page', async ({page}) => {
 
   await page.getByRole('button', { name: 'Order now' }).click();
   await expect(page.getByText('Awesome is a click away')).toBeVisible();
+});
+
+test('about page displays normally', async ({page}) => {
+  await page.goto('/about');
+  await expect(page.getByText('The secret sauce')).toBeVisible();
+  await expect(page.getByText('At JWT Pizza, our amazing')).toBeVisible();
+  await expect(page.getByText('FranchiseAboutHistory')).toBeVisible();
+});
+
+test('history page displays normally', async ({page}) => {
+  await page.goto('/history');
+  await expect(page.getByText('Mama Rucci, my my')).toBeVisible();
+  await expect(page.getByText('It all started in Mama Ricci\'')).toBeVisible();
+  await expect(page.getByRole('main').getByRole('img')).toBeVisible();
+  await expect(page.getByText('FranchiseAboutHistory')).toBeVisible();
 });
