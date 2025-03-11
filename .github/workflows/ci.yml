@@ -70,7 +70,7 @@ jobs:
   
       - name: Push to AWS S3
         run: |
-          echo Deploying ${{ needs.build.outputs.version }}
+          echo Deploying $version
           aws s3 cp dist s3://${{ secrets.APP_BUCKET }}/$version/ --recursive
       
       - name: Update staging version
@@ -79,7 +79,7 @@ jobs:
           aws cloudfront get-distribution-config --id ${{ secrets.DISTRIBUTION_ID }} > original.json
           etag=$(jq -r '.ETag' original.json)
           jq '.DistributionConfig' original.json > request.json
-          jq --arg version "/${{ needs.build.outputs.version }}" '.Origins.Items[0].OriginPath = $version' request.json > finalRequest.json
+          jq --arg version "/$version" '.Origins.Items[0].OriginPath = $version' request.json > finalRequest.json
           aws cloudfront update-distribution --id ${{ secrets.DISTRIBUTION_ID }} --if-match $etag --distribution-config file://finalRequest.json
       
           # Wait for the distribution to deploy and then invalidate the cache
@@ -96,7 +96,7 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
         env:
-          version: ${{needs.build.outputs.version}}
+          version: $version
         with:
           tag: version-${{ env.version }}
           name: Version ${{ env.version }}
