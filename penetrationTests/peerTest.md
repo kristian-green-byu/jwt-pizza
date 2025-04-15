@@ -1,3 +1,4 @@
+
 # Penetration Report
 
 This report was completed by **Kristian Green** and **Spencer Summerhays** after their respective self and peer penetration tests. Several vulnerabilities were found in both websites and changes were made to address those issues.
@@ -52,6 +53,20 @@ This report was completed by **Kristian Green** and **Spencer Summerhays** after
 | Corrections    | Changed the database.js code for the Update endpoint to sanitize inputs. I also preemptively sanitized inputs for getUserFranchises in case users attempt to exploit that endpoint with a similar attack after obtaining admin access.  |
 
 ---
+
+### Spencer Summerhays
+
+| Item           | Result                                                                         |
+| -------------- | ------------------------------------------------------------------------------ |
+| Date           | June 12, 2025                                                                 |
+| Target         | https://pizza.sws329.click/                                                       |
+| Classification | Inproper Input Validation                                                                    |
+| Severity       | 3                                                                              |
+| Description    | Order request with a negative price was successful and not only returned a valid jwt pizza despite the negative price, but it also lowered the franchise revenue by the amount of money in the request, effectively allowing someone to not only steal jwts but also money.
+| Images         | ![Negative Price Request](images/SelfNegativePriceRequest.png) <br/> Made a successful request with a verifiable jwt pizza despite having a negative price. <br/> ![Revenue Before Attack](images/SelfBeforeAttackRevenue.png) <br/> ![Revenue After Attack](images/SelfAfterAttackRevenue.png) <br/> Revenue indeed goes down by 100 bitcoin per the negative price request|
+| Corrections    | Added validation on price so that if the request price is changed from the original prices of the pizzas, the request will not succeed.                                                      |
+
+---
 ---
 ## Peer Attacks
 ### Attack on Spencer Summerhays by Kristian Green
@@ -88,7 +103,21 @@ This report was completed by **Kristian Green** and **Spencer Summerhays** after
 | Images         | ![Bruteforce attack on dummy account](images/bruteforce_peerattack_spencer.png) <br/> Used bruteforce to discover the simple password of a fake user. A total of 74 requests were made without throttling. |
 
 ---
+
+### Attack on Kristian Green by Spencer Summerhays
+
+| Item           | Result                                                                         |
+| -------------- | ------------------------------------------------------------------------------ |
+| Date           | April 15, 2025                                                                 |
+| Target         | https://pizza.kristian-green-byu.click                                            |
+| Classification | Inproper Input Validation                                                                      |
+| Severity       | 3                                                                              |
+| Description    | The order endpoint allows for the request to be changed without validating anything in the request body. For instance, I was able to make an order request with a negative request and obtain a new jwt pizza as well as lower the website's revenue |
+| Images         | ![Negative Price Request](images/PeerNegativePriceRequest.png) <br/> Changed price in request to -1 in order to steal 1 bitcoin from the website as well as get a free jwt pizza. |
+
+---
+
 ---
 # Combined Summary of Learnings
 
-To be completed...
+The main takeaway we had as we performed these penetration attacks on our own and eachother's websites was the importance of security testing. It's very easy to feel as if your website is secure, when in fact it is vulnerable to critical attacks. One specific thing we learned is the importance of validating input. For example, both websites were vulnerable to the price being changed in an order request, and both websites were vulnerable to registering users on top of existing users, along with other validation problems such as vulnerabilities to SQL injections. In a worst case scenario, the revenue of the company could be significantly impacted, and the whole database could be corrupted or taken down by attackers. Thus by focusing on ensuring that any user input is sanitized or validated, we can eliminate many security vulnerabilities. Also, it's important to throttle user requests so that they don't take down the website in a DDOS attack or attempt to use brute force attacks to obtain user passwords. Often, people use the same password in multiple places, so if an attacker managed to obtain a user's password, they could then try to access their email and even their bank account. Consequently, keeping your website secure is essential to protect your business and your customers.
